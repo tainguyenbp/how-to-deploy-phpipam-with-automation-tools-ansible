@@ -1,0 +1,6 @@
+- set_fact: role_name=php7
+
+##################################################
+##### Install php7
+- include: install.yml
+- include: configure.yml

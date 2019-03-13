@@ -1,0 +1,5 @@
+mariadb_admin_user: root
+mariadb_admin_password: passw0rd
+mariadb_phpipam_user: phpipam
+mariadb_phpipamadmin_password: phpipamadmin
+mariadb_database_name: phpipam

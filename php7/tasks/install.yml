@@ -1,0 +1,61 @@
+- name: Install module MySQL python
+  yum:
+    pkg: '{{ item }}'
+    state: installed
+  with_items:
+    - MySQL-python
+
+- name: Install EPEL repository
+  yum: 
+    pkg: '{{ item }}'
+    state: installed
+  with_items:
+    - epel-release
+
+- name: Update yum caсhe
+  yum:
+    update_cache: true
+
+- name: Install Webtatic repository
+  shell: rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
+  ignore_errors: yes
+
+- name: Update yum caсhe
+  yum:
+    update_cache: true
+
+- name: Remove version PHP old
+  yum:
+    pkg: "{{ item }}"
+    state: absent
+  with_items:
+    - php*
+
+- name: Install PHP 7.1 and all the required PHP modules
+  yum:
+    pkg: '{{ item }}'
+    state: installed
+  with_items:
+    - httpd
+    - php71w
+    - php71w-cli
+    - php71w-session 
+    - php71w-sockets
+    - php71w-gmp
+    - php71w-mcrypt
+    - php71w-simplexml
+    - php71w-json
+    - php71w-gettext
+    - php71w-filter
+    - php71w-pcntl
+    - php71w-mbstring
+    - php71w-gd
+    - php71w-common
+    - php71w-ldap
+    - php71w-pdo
+    - php71w-pear
+    - php71w-snmp
+    - php71w-xml
+    - php71w-mysql
+    - git
+

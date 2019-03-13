@@ -1,0 +1,59 @@
+- name: Extract file configure phpipam version 1.3.2
+  unarchive:
+    src: phpipam1.3.2.tar.gz
+    dest: /var/www/
+
+- name: Changing provide the ownership of the application to web server user
+  file:
+    dest: /var/www/phpipam
+    state: directory
+    owner: apache
+    group: apache
+    recurse: yes
+
+- name: Copy /var/www/phpipam/config.dist.php to /var/www/phpipam/config.php
+  copy: 
+    src: /var/www/phpipam/config.dist.php
+    dest: /var/www/phpipam/config.php
+    remote_src: yes
+
+- name: Copy file config phpipam.conf to folder /etc/httpd/conf.d/
+  template:
+    src: phpipam.conf
+    dest: /etc/httpd/conf.d/phpipam.conf
+
+- name: Import database default of the phpipam
+  #command: mysql --user=root --password=passw0rd phpipam < /var/www/phpipam/db/SCHEMA.sql
+  mysql_db:
+    name: "{{mariadb_database_name}}"
+    login_host: 127.0.0.1
+    login_user: "{{ mariadb_admin_user }}"
+    login_password: "{{ mariadb_admin_password }}"
+    target: /var/www/phpipam/db/SCHEMA.sql
+    state: import
+  #command: mysql --user="{{mariadb_admin_user}}" --password="{{mariadb_admin_password}}" "{{mariadb_database_name}}" < "{{ item }}"
+  #with_items:
+  #  - /var/www/phpipam/db/SCHEMA.sql
+
+- name: Reload privilege tables
+  command: mysql --user={{mariadb_admin_user}} --password={{mariadb_admin_password}} -e "{{ item }}"
+  with_items:
+    - FLUSH PRIVILEGES;
+
+- name: Restart the service mariadb
+  systemd:
+    state: restarted
+    name: mariadb
+    enabled: true
+
+- name: Enable service httpd and ensure it is not masked
+  systemd:
+    name: httpd
+    enabled: yes
+    masked: no
+
+- name: Restart the service httpd
+  systemd:
+    state: restarted
+    name: httpd
+    enabled: true
